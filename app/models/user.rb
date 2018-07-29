@@ -5,6 +5,7 @@ class User < ApplicationRecord
   has_many :sessions
 
   validates :email, :username, :firstname, :lastname, presence: true
+  validates :email, :username, uniqueness: true
 
   SYSTEM = 'SYSTEM'
 end

@@ -4,4 +4,5 @@ class Subtopic < ApplicationRecord
   has_many :questions
 
   validates :code, :name, presence: true
+  validates :code, uniqueness: { scope: :topic }
 end

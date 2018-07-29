@@ -4,4 +4,5 @@ class Course < ApplicationRecord
   has_many :questions, through: :subtopics
 
   validates :code, :name, presence: true
+  validates :code, uniqueness: true
 end
