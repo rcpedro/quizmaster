@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_07_29_031203) do
+ActiveRecord::Schema.define(version: 2018_07_29_081725) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -61,9 +61,13 @@ ActiveRecord::Schema.define(version: 2018_07_29_031203) do
     t.string "updated_by", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "topic_id", null: false
+    t.bigint "course_id", null: false
     t.index ["author_id"], name: "index_questions_on_author_id"
+    t.index ["course_id"], name: "index_questions_on_course_id"
     t.index ["status"], name: "index_questions_on_status"
     t.index ["subtopic_id"], name: "index_questions_on_subtopic_id"
+    t.index ["topic_id"], name: "index_questions_on_topic_id"
   end
 
   create_table "session_question_answers", force: :cascade do |t|

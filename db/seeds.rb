@@ -5,3 +5,29 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+english = Course.find_or_create_by!(
+  code: 'ENGLIT', name: 'English Literature', 
+  description: 'Explore a wide range of texts dating from a variety of periods.'
+)
+
+french = Course.find_or_create_by!(
+  code: 'FRSPEAK', name: 'French Speaking', 
+  description: 'Get an easy introduction to French or just consolidate your basic knowledge.'
+)
+
+math = Course.find_or_create_by!(
+  code: 'MATH', name: 'Mathematics',
+  description: 'Get introductions to algebra, geometry, trigonometry, precalculus and calculus.'
+)
+
+arithmetic = Topic.find_or_create_by!(
+  course: math, code: 'ARITH', name: 'Arithmetic', 
+  description: 'Learn addition, subtraction, multiplication, division and many more!'
+)
+
+addition = Subtopic.find_or_create_by!(
+  topic: arithmetic, code: 'ADD', name: 'Addition',
+  description: 'Calculate the total of two or more numbers or amounts.'
+)
+
