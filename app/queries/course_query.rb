@@ -1,4 +1,4 @@
-class CoursesQuery
+class CourseQuery
   def list(params)
     return Course.filter({
       code: { startswith: params[:code] },

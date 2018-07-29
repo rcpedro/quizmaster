@@ -1,4 +1,4 @@
-class QuestionsQuery
+class QuestionQuery
   def list(params)
     return Question.filter({
       course_id:   { eq: params[:course_id] },

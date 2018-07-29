@@ -1,4 +1,4 @@
-class SessionsQuery
+class SessionQuery
   def list(params)
     return Session.filter({
       user_id: { eq: params[:user_id] },
