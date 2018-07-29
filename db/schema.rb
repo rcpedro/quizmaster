@@ -38,7 +38,7 @@ ActiveRecord::Schema.define(version: 2018_07_29_081725) do
     t.string "updated_by", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["code"], name: "index_courses_on_code"
+    t.index ["code"], name: "index_courses_on_code", unique: true
   end
 
   create_table "question_contents", force: :cascade do |t|
@@ -136,8 +136,8 @@ ActiveRecord::Schema.define(version: 2018_07_29_081725) do
     t.string "updated_by", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_users_on_email"
-    t.index ["username"], name: "index_users_on_username"
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["username"], name: "index_users_on_username", unique: true
   end
 
   add_foreign_key "questions", "users", column: "author_id"
