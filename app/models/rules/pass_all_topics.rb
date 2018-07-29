@@ -1,0 +1,2 @@
+class Rules::PassAllTopics
+end

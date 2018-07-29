@@ -1,0 +1,2 @@
+class ModeRule < ApplicationRecord
+end

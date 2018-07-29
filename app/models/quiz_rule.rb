@@ -1,0 +1,2 @@
+class QuizRule < ApplicationRecord
+end

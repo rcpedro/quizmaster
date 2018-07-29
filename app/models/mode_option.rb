@@ -1,0 +1,2 @@
+class ModeOption < ApplicationRecord
+end
