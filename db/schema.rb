@@ -26,8 +26,14 @@ ActiveRecord::Schema.define(version: 2018_07_29_124327) do
   end
 
   create_table "choices", force: :cascade do |t|
+    t.bigint "question_id", null: false
+    t.string "value", null: false
+    t.boolean "correct", null: false
+    t.string "created_by", null: false
+    t.string "updated_by", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["question_id"], name: "index_choices_on_question_id"
   end
 
   create_table "courses", force: :cascade do |t|

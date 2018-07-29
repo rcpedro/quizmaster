@@ -31,3 +31,40 @@ addition = Subtopic.find_or_create_by!(
   description: 'Calculate the total of two or more numbers or amounts.'
 )
 
+
+guest = User.find_or_initialize_by(
+  email: 'guest@quizmaster.com',
+  username: 'guest',
+  firstname: 'Guest',
+  lastname: 'User'
+)
+guest.password = 'QuizMaster'
+guest.password_confirmation = 'QuizMaster'
+guest.save!
+
+
+q1 = ActionController::Parameters.new({
+  question: { subtopic_id: addition.id, type: 'Questions::OpenResponse', status: 'published' },
+  answer: { value: '2' },
+  content: { markdown: '1 + 1 = ?' }
+})
+QuestionForm.new(q1).create
+
+q2 = ActionController::Parameters.new({
+  question: { subtopic_id: addition.id, type: 'Questions::OpenResponse', status: 'published' },
+  answer: { value: '2' },
+  content: { markdown: 'John and Amy have *two* apples each. John decided to give Amy *one* of his apples. How many apples does Amy have?' }
+})
+QuestionForm.new(q2).create
+
+q3 = ActionController::Parameters.new({
+  question: { subtopic_id: addition.id, type: 'Questions::MultipleChoice', status: 'published' },
+  choices: [
+    { value: '4', correct: true }, 
+    { value: '3', correct: false },
+    { value: '5', correct: false }
+  ],
+  content: { markdown: '1 + ? = 5' }
+})
+QuestionForm.new(q3).create
+
