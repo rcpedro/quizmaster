@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_07_29_081725) do
+ActiveRecord::Schema.define(version: 2018_07_29_124327) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -41,6 +41,40 @@ ActiveRecord::Schema.define(version: 2018_07_29_081725) do
     t.index ["code"], name: "index_courses_on_code", unique: true
   end
 
+  create_table "mode_options", force: :cascade do |t|
+    t.bigint "mode_id", null: false
+    t.bigint "option_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["mode_id"], name: "index_mode_options_on_mode_id"
+    t.index ["option_id"], name: "index_mode_options_on_option_id"
+  end
+
+  create_table "mode_rules", force: :cascade do |t|
+    t.bigint "mode_id", null: false
+    t.bigint "rule_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["mode_id"], name: "index_mode_rules_on_mode_id"
+    t.index ["rule_id"], name: "index_mode_rules_on_rule_id"
+  end
+
+  create_table "modes", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "description", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "options", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "description", null: false
+    t.string "type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["type"], name: "index_options_on_type"
+  end
+
   create_table "question_contents", force: :cascade do |t|
     t.bigint "question_id", null: false
     t.integer "status", default: 0, null: false
@@ -54,20 +88,60 @@ ActiveRecord::Schema.define(version: 2018_07_29_081725) do
   end
 
   create_table "questions", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.bigint "topic_id", null: false
     t.bigint "subtopic_id", null: false
     t.bigint "author_id", null: false
     t.integer "status", default: 0, null: false
+    t.string "type", null: false
     t.string "created_by", null: false
     t.string "updated_by", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "topic_id", null: false
-    t.bigint "course_id", null: false
     t.index ["author_id"], name: "index_questions_on_author_id"
     t.index ["course_id"], name: "index_questions_on_course_id"
     t.index ["status"], name: "index_questions_on_status"
     t.index ["subtopic_id"], name: "index_questions_on_subtopic_id"
     t.index ["topic_id"], name: "index_questions_on_topic_id"
+    t.index ["type"], name: "index_questions_on_type"
+  end
+
+  create_table "quiz_options", force: :cascade do |t|
+    t.bigint "quiz_id", null: false
+    t.bigint "option_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["option_id"], name: "index_quiz_options_on_option_id"
+    t.index ["quiz_id"], name: "index_quiz_options_on_quiz_id"
+  end
+
+  create_table "quiz_rules", force: :cascade do |t|
+    t.bigint "quiz_id", null: false
+    t.bigint "rule_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["quiz_id"], name: "index_quiz_rules_on_quiz_id"
+    t.index ["rule_id"], name: "index_quiz_rules_on_rule_id"
+  end
+
+  create_table "quizzes", force: :cascade do |t|
+    t.bigint "student_id", null: false
+    t.bigint "course_id", null: false
+    t.bigint "quizmode_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id"], name: "index_quizzes_on_course_id"
+    t.index ["quizmode_id"], name: "index_quizzes_on_quizmode_id"
+    t.index ["student_id"], name: "index_quizzes_on_student_id"
+  end
+
+  create_table "rules", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "description", null: false
+    t.string "type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["type"], name: "index_rules_on_type"
   end
 
   create_table "session_question_answers", force: :cascade do |t|
@@ -89,13 +163,13 @@ ActiveRecord::Schema.define(version: 2018_07_29_081725) do
   end
 
   create_table "sessions", force: :cascade do |t|
-    t.bigint "student_id", null: false
+    t.bigint "quiz_id", null: false
     t.datetime "start", null: false
     t.datetime "end"
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["student_id"], name: "index_sessions_on_student_id"
+    t.index ["quiz_id"], name: "index_sessions_on_quiz_id"
   end
 
   create_table "subtopics", force: :cascade do |t|
@@ -141,5 +215,5 @@ ActiveRecord::Schema.define(version: 2018_07_29_081725) do
   end
 
   add_foreign_key "questions", "users", column: "author_id"
-  add_foreign_key "sessions", "users", column: "student_id"
+  add_foreign_key "quizzes", "users", column: "student_id"
 end
