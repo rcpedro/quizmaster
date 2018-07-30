@@ -1,24 +1,15 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+### System Requirements:
+* Ruby 2.3.3
+* Rails 5.2
+* Posgres
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+### How to Run:
+* Install ruby and then rails.
+* Go to project directory and run ```bundle install```
+* Create database with ```bundle exec rake db:create```
+* Migrate with ```bundle exec rake db:migrate```
+* Seed with ```bundle exec rake db:seed``` for both ```RAILS_ENV=test``` and ```RAILS_ENV=dev```
+* Run ```rails s```
+* Quiz is accessible at the index and the CRUD app at ```/admin```.
