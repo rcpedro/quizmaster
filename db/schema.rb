@@ -66,13 +66,17 @@ ActiveRecord::Schema.define(version: 2018_07_29_124327) do
   end
 
   create_table "modes", force: :cascade do |t|
+    t.string "code", null: false
     t.string "name", null: false
     t.string "description", null: false
+    t.json "config"
+    t.string "type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "options", force: :cascade do |t|
+    t.string "code", null: false
     t.string "name", null: false
     t.string "description", null: false
     t.string "type", null: false
@@ -115,6 +119,7 @@ ActiveRecord::Schema.define(version: 2018_07_29_124327) do
   create_table "quiz_options", force: :cascade do |t|
     t.bigint "quiz_id", null: false
     t.bigint "option_id", null: false
+    t.json "config"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["option_id"], name: "index_quiz_options_on_option_id"
@@ -124,6 +129,7 @@ ActiveRecord::Schema.define(version: 2018_07_29_124327) do
   create_table "quiz_rules", force: :cascade do |t|
     t.bigint "quiz_id", null: false
     t.bigint "rule_id", null: false
+    t.json "config"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["quiz_id"], name: "index_quiz_rules_on_quiz_id"
@@ -133,15 +139,16 @@ ActiveRecord::Schema.define(version: 2018_07_29_124327) do
   create_table "quizzes", force: :cascade do |t|
     t.bigint "student_id", null: false
     t.bigint "course_id", null: false
-    t.bigint "quizmode_id", null: false
+    t.bigint "mode_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["course_id"], name: "index_quizzes_on_course_id"
-    t.index ["quizmode_id"], name: "index_quizzes_on_quizmode_id"
+    t.index ["mode_id"], name: "index_quizzes_on_mode_id"
     t.index ["student_id"], name: "index_quizzes_on_student_id"
   end
 
   create_table "rules", force: :cascade do |t|
+    t.string "code", null: false
     t.string "name", null: false
     t.string "description", null: false
     t.string "type", null: false
