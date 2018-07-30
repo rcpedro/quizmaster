@@ -13,3 +13,6 @@
 * Seed with ```bundle exec rake db:seed``` for both ```RAILS_ENV=test``` and ```RAILS_ENV=dev```
 * Run ```rails s```
 * Quiz is accessible at the index and the CRUD app at ```/admin```.
+
+## Misc:
+* Formatting is done using Markdown.
