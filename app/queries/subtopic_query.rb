@@ -1,6 +1,6 @@
 class SubtopicQuery
   def list(params)
-    return Topic.filter({
+    return Subtopic.filter({
       code: { startswith: params[:code] },
       name: { startswith: params[:name] },
       description: { contains: params[:description] },

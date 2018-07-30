@@ -31,6 +31,20 @@ addition = Subtopic.find_or_create_by!(
   description: 'Calculate the total of two or more numbers or amounts.'
 )
 
+subtract = Subtopic.find_or_create_by!(
+  topic: arithmetic, code: 'SUBTRACT', name: 'Subtraction',
+  description: 'Calculate the difference between two or more numbers or amounts.'
+)
+
+multiply = Subtopic.find_or_create_by!(
+  topic: arithmetic, code: 'MULTIPLy', name: 'Multiplication',
+  description: 'Calculate multiple additions.'
+)
+
+divide = Subtopic.find_or_create_by!(
+  topic: arithmetic, code: 'DIVIDE', name: 'Division',
+  description: 'Calculate how to divide numbers.'
+)
 
 guest = User.find_or_initialize_by(
   email: 'guest@quizmaster.com',
@@ -44,21 +58,21 @@ guest.save!
 
 
 q1 = ActionController::Parameters.new({
-  question: { subtopic_id: addition.id, type: 'Questions::OpenResponse', status: 'published' },
+  question: { subtopic_id: addition.id, type: 'Questions::OpenResponse', status: 1 },
   answer: { value: '2' },
   content: { markdown: '1 + 1 = ?' }
 })
 QuestionForm.new(q1).create
 
 q2 = ActionController::Parameters.new({
-  question: { subtopic_id: addition.id, type: 'Questions::OpenResponse', status: 'published' },
+  question: { subtopic_id: addition.id, type: 'Questions::OpenResponse', status: 1 },
   answer: { value: '2' },
   content: { markdown: 'John and Amy have *two* apples each. John decided to give Amy *one* of his apples. How many apples does Amy have?' }
 })
 QuestionForm.new(q2).create
 
 q3 = ActionController::Parameters.new({
-  question: { subtopic_id: addition.id, type: 'Questions::MultipleChoice', status: 'published' },
+  question: { subtopic_id: addition.id, type: 'Questions::MultipleChoice', status: 1 },
   choices: [
     { value: '4', correct: true }, 
     { value: '3', correct: false },
