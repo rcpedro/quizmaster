@@ -1,3 +1,3 @@
 class Rule < ApplicationRecord
-  self.abstract_class = true
+  include Codeable
 end

@@ -13,8 +13,8 @@ class Form
 
   def transaction(model)
     model.transaction do
-      model.created_by = self.current_user.email if not model.persisted?
-      model.updated_by = self.current_user.email
+      model.created_by = self.current_user.email if not model.persisted? and self.respond_to?(:created_by)
+      model.updated_by = self.current_user.email if self.respond_to?(:updated_by)
       yield
     end
   end
@@ -28,7 +28,7 @@ class Form
   end
 
   def save_associations(relation, props)
-    return if props.blank?
+    return true if props.blank?
 
     result = true
     props.each do |prop|
@@ -42,7 +42,7 @@ class Form
   end
 
   def save_related(klass, prop)
-    return if prop.blank?
+    return true if prop.blank?
 
     obj = klass.new
     obj = klass.find(prop[:id]) if prop[:id].present?

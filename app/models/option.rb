@@ -1,3 +1,3 @@
 class Option < ApplicationRecord
-  self.abstract_class = true
+  include Codeable
 end
