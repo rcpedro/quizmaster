@@ -14,7 +14,7 @@ class Filter
     sameweek:  Proc.new { |field, value| ["date_trunc('week',  #{field})", value.to_date.beginning_of_week] },
     samemonth: Proc.new { |field, value| ["date_trunc('month', #{field})", value.to_date.beginning_of_month] },
     
-    in:      Proc.new { |field, value| [field, value] },
+    in:      Proc.new { |field, value| ["#{field} in (?)", value] },
     isnull:  Proc.new { |field, value| [field, (value.present? and value) ? 'null' : 'not null'] }
   }.with_indifferent_access
 

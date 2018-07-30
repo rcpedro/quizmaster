@@ -1,0 +1,270 @@
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="css/custom.css">
+
+    <title>QuizMaster</title>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.8.6/showdown.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.7.2/angular-sanitize.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-light bg-light">
+      <a class="navbar-brand" href="#">
+        <img src="/images/logo.png" class='logo'> QuizMaster
+      </a>
+    </nav>
+
+    <div id="dashboard" ng-app="admin" ng-controller="appCtrl">
+      <!-- Question -->
+      <div id="questions" ng-show="app.mode == 'list'">
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin: 16px" ng-show="app.deleteSuccess">
+          <strong>Success!</strong> Record has been deleted!
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <h2 style="margin: 32px;">
+          Questions
+          <button class="btn btn-success" style="float: right;" ng-click="app.routes.add()">
+            <i class="fa fa-plus"></i> Add
+          </button>
+        </h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th width="8%">#</th>
+              <th width="*">Question</th>
+              <th width="15%">Subtopic</th>
+              <th width="10%">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="question in app.questions">
+              <td>{{ question.id }}</td>
+              <td><p ng-bind-html="app.renderQuestion(question)"></p></td>
+              <td>{{ question.subtopic.name }}</td>
+              <td>
+                <button ng-click="app.routes.edit(question.id)" class="btn btn-success">
+                  <i class="fa fa-pencil"></i>
+                </button>
+                <button class="btn btn-danger" ng-click="app.delete(question)">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- End Question -->
+
+      <!-- Add -->
+      <form name="questionForm" id="question" ng-show="app.mode == 'add' || app.mode == 'edit'">
+        <div class="page container">
+          <div class="alert alert-success alert-dismissible fade show" role="alert" ng-show="app.saveSuccess">
+            <strong>Success!</strong> Record has been saved successfully!
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <h3>
+            <span ng-show="app.mode == 'add'">Add Question</span>
+            <span ng-show="app.mode == 'edit'">Edit Question</span>
+            <button class="btn btn-primary" style="float: right;" ng-click="app.routes.list()">Go Back</button>
+          </h3>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="question">Subtopic:</label>
+                <select ng-model="app.form.question.subtopic_id" 
+                        class="form-control" ng-options="s.id as s.name for s in app.subtopics"
+                        required="required">
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="question">Question:</label>
+                <textarea ng-model="app.form.content.markdown"
+                          rows="10" class="form-control" 
+                          name="question" required="required"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="answer">Answer:</label>
+                <input ng-model="app.form.answer.value" class="form-control" name="answer" type="text" 
+                       autocomplete="off" required="required">
+              </div>
+              <div style="margin-top: 32px;">
+                <button class="btn btn-success" ng-click="app.save()">
+                  <i class="fa fa-save"></i>
+                  Save
+                </button>
+                <button ng-show="app.mode == 'edit'" class="btn btn-danger" style="float: right;" ng-click="app.delete(app.form.question)">
+                  <i class="fa fa-trash"></i>
+                  Delete
+                </button>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="question">Preview:</label>
+                <div class="card" style="margin: 0">
+                  <div class="card-body">
+                    <h5 class="card-title">Topic Name</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Subtopic Name</h6>
+                    <p class="card-text">
+                      <p ng-bind-html="app.renderForm(app.form)"></p>
+                    </p>
+                    <input placeholder="Students will answer here..." type="text" name="sample" class="form-control" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <!-- End Add -->
+    </div>
+
+    <script type="text/javascript">
+      const app = angular.module("admin", ['ngSanitize']);
+      const converter = new showdown.Converter();
+
+      const QuestionApp = function ($scope) {
+        var self = {
+          mode: 'list',
+
+          subtopics: [],
+          questions: [],
+          question: {},
+
+          saveSuccess: false,
+          deleteSuccess: false,
+
+          form: { 
+            question: { type: 'Questions::OpenResponse', subtopic_id: null, status: 'published' },
+            content: { markdown: '' },
+            answer: { value: null }
+          },
+
+          renderQuestion: function (question) {
+            if (question.draft) {
+              return converter.makeHtml(question.draft.markdown);
+            } else if (question.published) {
+              return converter.makeHtml(question.published.markdown);
+            }
+          },
+
+          renderForm: function (form) {
+            return converter.makeHtml(form.content.markdown);
+          },
+
+          routes: {
+            list: function () {
+              self.mode = 'list';
+              self.loadQuestions();
+            },
+
+            add: function () {
+              self.mode = 'add';
+              self.question = {};
+            },
+
+            edit: function (id) {
+              self.mode = 'edit';
+              axios.get('/api/v1/questions/' + id)
+                   .then(function (response) { 
+                      self.question = response.data; 
+                      self.load();
+                      self.notify(); 
+                    })
+            },
+          },
+
+          load: function () {
+            var working = self.question.published;
+            var q = Object.assign({}, self.question);
+            var working = q.draft || q.published;
+
+            self.form = {
+              question: { 
+                id: q.id,
+                type: 'Questions::OpenResponse', 
+                subtopic_id: q.subtopic_id, 
+                status: 1
+              },
+              content: { markdown: working.markdown  },
+              answer: { value: q.answer.value }
+            }
+
+            self.mode = 'edit';
+          },
+
+          save: function () {
+            if ($scope.questionForm.$valid) {
+              var promise = null;
+
+              if (self.mode == 'edit') promise = axios.put('/api/v1/questions/' + self.form.question.id, self.form);
+              if (self.mode == 'add') promise = axios.post('/api/v1/questions', self.form);
+
+              promise.then(function (response) { 
+                self.question = response.data; 
+                self.saveSuccess = true;
+                self.load();
+                self.notify(); 
+              });
+            }
+          },
+
+          delete: function (question) {
+            if (confirm('Are you sure you want to delete this question?')) {
+              axios.delete('/api/v1/questions/' + question.id).then(function (e) {
+                self.routes.list();
+                self.deleteSuccess = true;
+                self.notify();
+              });
+            }
+          },
+
+          notify: function () {
+            $scope.$apply();
+            console.log(self);
+          },
+
+          loadQuestions: function () {
+            axios.get('/api/v1/questions')
+                 .then(function (response) { self.questions = response.data; self.notify(); })
+          },
+
+          loadSubtopics: function () {
+            axios.get('/api/v1/subtopics')
+                 .then(function (response) { self.subtopics = response.data; self.notify(); });
+          },
+        };
+
+        return self;
+      };
+
+      app.controller('appCtrl', function($scope) {
+        $scope.app = QuestionApp($scope);
+        $scope.app.loadQuestions();
+        $scope.app.loadSubtopics();
+      });
+    </script>
+  </body>
+</html>

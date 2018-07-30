@@ -82,8 +82,8 @@ q3 = ActionController::Parameters.new({
 })
 QuestionForm.new(q3).create
 
-no_of_questions = Option.find_or_create_by!(code: 'no_of_questions', name: 'Question Count', description: 'Customize the no. of questions per quiz.', type: 'Options::QuestionCount')
-subtopic = Option.find_or_create_by!(code: 'subtopic', name: 'Specialize', description: 'Select the subtopics you would like to specialize in.', type: 'Options::Subtopic')
+no_of_questions = Option.find_or_create_by!(id: 1, code: 'no_of_questions', name: 'Question Count', description: 'Customize the no. of questions per quiz.', type: 'Options::QuestionCount')
+subtopic = Option.find_or_create_by!(id: 2, code: 'subtopic', name: 'Specialize', description: 'Select the subtopics you would like to specialize in.', type: 'Options::Subtopic')
 
 
 

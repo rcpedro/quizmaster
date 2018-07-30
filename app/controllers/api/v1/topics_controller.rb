@@ -3,7 +3,7 @@ class Api::V1::TopicsController < ApplicationController
   before_action :set_topic, only: [:show]
 
   def index
-    render json: @query.list(params)
+    render json: @query.list(params).as_json(include: { subtopics: { only: [:id] }})
   end
 
   def show

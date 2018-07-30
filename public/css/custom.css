@@ -1,0 +1,22 @@
+.logo {
+  width: 32px;
+  margin-right: 8px;
+}
+
+.page {
+  padding: 32px;
+}
+
+.page .card {
+  margin: 16px;
+  text-align: left;
+}
+
+.empty {
+  text-align: center;
+}
+
+.empty img {
+  width: 128px;
+  margin: 64px 0;
+}

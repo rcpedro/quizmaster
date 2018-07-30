@@ -1,0 +1,182 @@
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="css/custom.css">
+
+    <title>QuizMaster</title>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.8.6/showdown.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-light bg-light">
+      <a class="navbar-brand" href="#">
+        <img src="/images/logo.png" class='logo'> QuizMaster
+      </a>
+    </nav>
+
+    <div id="dashboard" ng-app="quiz" ng-controller="appCtrl">
+      <!-- Courses -->
+      <div id="courses" class="page" ng-show="app.mode == 'courses'">
+        <div class="row">
+          <div class="col-sm-12" >
+            <div class="card d-inline-block" ng-repeat="course in app.courses" style="width: 18rem;">
+              <img class="card-img-top" src="images/courses/{{ course.code }}.gif" alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title">{{course.title}}</h5>
+                <p class="card-text">{{course.description}}</p>
+                <a ng-click="app.routes.topic(course)" class="btn btn-primary">Explore</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Courses -->
+
+      <!-- Topic -->
+      <div id="topics" class="page" ng-show="app.mode == 'topics'">
+        <div class="row">
+          <div class="col-sm-12">
+            <h2>
+              Explore {{ app.course.name }}
+              <button class="btn btn-primary" style="float: right;" ng-click="app.routes.course()">Go Back</button>
+            </h2>
+          </div>
+          <div class="col-sm-12" >
+            <div class="card d-inline-block" ng-repeat="topic in app.topics" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">{{topic.name}}</h5>
+                <p class="card-text">{{topic.description}}</p>
+                <p><button class="btn btn-primary" ng-click="app.startQuiz(topic)">Start Quiz</button></p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12">
+            <div class="empty" ng-show="app.topics.length == 0">
+              <img src="/images/construction.png" />
+              <h5>Oops, there seems to be nothing here.</h5>
+              <p>Come back after a few days, we're still busy crafting quizzes.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Topic -->
+
+      <!-- Session -->
+      <div id="sessions" class="page" ng-show="app.mode == 'session'">
+        
+      </div>
+      <!-- End Session -->
+    </div>
+
+    <script type="text/javascript">
+      const app = angular.module("quiz", []);
+
+      const Quizzer = function (session) {
+        var self = {
+          session: session,
+
+          answer: function (answer, sessQuestion) {
+            
+          }
+        }
+      };
+
+      const QuizApp = function ($scope, $sanitize) {
+        var self = {
+          mode: 'courses',
+
+          courses: [],
+          topics: [],
+          session: {},
+
+          course: {},
+          topic: {},
+          session: {},
+          quiz: {},
+          quizzer: {},
+
+          converter: new showdown.Converter(),
+
+          routes: {
+            course: function () {
+              self.mode = 'courses';
+              self.loadCourses();
+            },
+
+            topic: function (course) {
+              self.course = course;
+              self.mode = 'topics';
+              self.loadTopics(course.id);
+            },
+
+            session: function (session) {
+              self.session = session;
+              self.mode = 'session';
+              self.quzzer = Quizzer(session);
+            }
+          },
+
+          notify: function () {
+            $scope.$apply();
+            console.log(self);
+          },
+
+          loadCourses: function () {
+            axios.get('/api/v1/courses')
+                 .then(function (response) { self.courses = response.data; self.notify(); });
+          },
+
+          loadTopics: function (course_id) {
+            axios.get('/api/v1/topics?course_id=' + course_id)
+                 .then(function (response) { self.topics = response.data; self.notify(); console.log(response.data); });
+          },
+
+          startQuiz: function (topic) {
+            self.topic = topic;
+            
+            var defaultOptions = [
+              { option_id: 1, config: { value: 3 }},
+              { option_id: 2, config: { subtopics: topic.subtopics.map(s => s.id) }}
+            ];
+
+            var quiz = {
+              options: defaultOptions,
+              course_id: self.course.id
+            }
+
+            axios.post('/api/v1/quizzes', quiz)
+                 .then(function (quizResp) { 
+                    self.quiz = quizResp.data; 
+                    
+                    axios.post('/api/v1/sessions', { quiz_id: quiz.id })
+                        .then(function (sessRep) {
+                          self.routes.session(sessRep.data);
+                          self.notify();
+                        })
+                  });
+          }
+        };
+
+        return self;
+      }
+
+      app.controller('appCtrl', function($scope) {
+        $scope.app = QuizApp($scope);
+        $scope.app.loadCourses();
+      });
+    </script>
+  </body>
+</html>

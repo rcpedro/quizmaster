@@ -7,6 +7,7 @@ Rails.application.routes.draw do
       resources :topics,    only: [:index, :show]
       resources :subtopics, only: [:index, :show]
       resources :questions
+      resources :quizzes,   only: [:show, :create]
     end
   end
 end
