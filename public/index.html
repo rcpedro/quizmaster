@@ -17,6 +17,7 @@
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.8.6/showdown.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.7.2/angular-sanitize.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
   </head>
 
@@ -59,7 +60,7 @@
               <div class="card-body">
                 <h5 class="card-title">{{topic.name}}</h5>
                 <p class="card-text">{{topic.description}}</p>
-                <p><button class="btn btn-primary" ng-click="app.startQuiz(topic)">Start Quiz</button></p>
+                <p><button class="btn btn-primary" ng-click="app.routes.quiz(topic)">Start Quiz</button></p>
               </div>
             </div>
           </div>
@@ -75,26 +76,42 @@
       <!-- End Topic -->
 
       <!-- Session -->
-      <div id="sessions" class="page" ng-show="app.mode == 'session'">
-        
+      <div id="sessions" class="page" ng-show="app.mode == 'session' && !app.finished">
+        <div class="card-body" style="width: 256px; margin: auto;">
+          <h5 class="card-title">{{ app.topic.name }}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">Answer the question below:</h6>
+          <p class="card-text">
+            <p ng-bind-html="app.renderQuestion(app.question)"></p>
+          </p>
+          <input ng-model="app.answer" placeholder="Answer here" type="text" name="sample" class="form-control" />
+          <button ng-click="app.check()" style="margin-top: 16px;" class="btn full btn-success">Submit</button>
+        </div>
       </div>
       <!-- End Session -->
+
+      <!-- Finished -->
+      <div id="scope" class="page" ng-show="app.finished">
+        <div class="card-body" style="width: 256px; margin: auto;">
+          <h5 class="card-title">{{ app.score }} / {{ app.total }}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">Congratulations! You have finished the quiz!</h6>
+          <p class="card-text">
+            Do you want to try again? Or maybe study something else?
+          </p>
+
+          <div style="margin-top: 16px;">
+            <button ng-click="app.routes.quiz(app.topic)" class="btn btn-full btn-success">Try Again</button>
+            <button ng-click="app.routes.topic(app.course)" style="float: right;" class="btn btn-full btn-primary">Go Back</button>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <script type="text/javascript">
-      const app = angular.module("quiz", []);
+      const app = angular.module("quiz", ['ngSanitize']);
+      const converter = new showdown.Converter();
 
-      const Quizzer = function (session) {
-        var self = {
-          session: session,
-
-          answer: function (answer, sessQuestion) {
-            
-          }
-        }
-      };
-
-      const QuizApp = function ($scope, $sanitize) {
+      const QuizApp = function ($scope) {
         var self = {
           mode: 'courses',
 
@@ -105,8 +122,12 @@
           course: {},
           topic: {},
           session: {},
-          quiz: {},
-          quizzer: {},
+
+          question: {},
+          answer: null,
+          score: 0,
+          total: 0,
+          finished: false,
 
           converter: new showdown.Converter(),
 
@@ -114,19 +135,50 @@
             course: function () {
               self.mode = 'courses';
               self.loadCourses();
+              self.finished = false;
+              self.questions = [];
             },
 
             topic: function (course) {
               self.course = course;
               self.mode = 'topics';
               self.loadTopics(course.id);
+              self.finished = false;
+              self.questions = [];
             },
 
-            session: function (session) {
-              self.session = session;
+            quiz: function (topic) {
               self.mode = 'session';
-              self.quzzer = Quizzer(session);
+              self.topic = topic;
+              self.finished = false;
+              self.questions = [];
+
+              axios.get('/api/v1/questions?topic_id=' + self.topic.id)
+                   .then(function (response) { 
+                      self.questions = response.data; 
+                      self.question = response.data[0];
+                      self.notify();
+                    })
             }
+          },
+
+          renderQuestion: function (question) {
+            if (question.draft) {
+              return converter.makeHtml(question.draft.markdown);
+            } else if (question.published) {
+              return converter.makeHtml(question.published.markdown);
+            }
+          },
+
+          check: function () {
+            axios.get('/api/v1/questions/' + self.question.id + '/validate?answer=' + self.answer)
+                 .then(function (response) { 
+                    if (response.data.result) self.score += 1;
+                    self.total += 1;
+                    self.question = self.questions[self.total];
+                    if (!self.question) self.finished = true;
+                    self.notify();
+                  });
           },
 
           notify: function () {
@@ -141,32 +193,7 @@
 
           loadTopics: function (course_id) {
             axios.get('/api/v1/topics?course_id=' + course_id)
-                 .then(function (response) { self.topics = response.data; self.notify(); console.log(response.data); });
-          },
-
-          startQuiz: function (topic) {
-            self.topic = topic;
-            
-            var defaultOptions = [
-              { option_id: 1, config: { value: 3 }},
-              { option_id: 2, config: { subtopics: topic.subtopics.map(s => s.id) }}
-            ];
-
-            var quiz = {
-              options: defaultOptions,
-              course_id: self.course.id
-            }
-
-            axios.post('/api/v1/quizzes', quiz)
-                 .then(function (quizResp) { 
-                    self.quiz = quizResp.data; 
-                    
-                    axios.post('/api/v1/sessions', { quiz_id: quiz.id })
-                        .then(function (sessRep) {
-                          self.routes.session(sessRep.data);
-                          self.notify();
-                        })
-                  });
+                 .then(function (response) { self.topics = response.data; self.notify(); });
           }
         };
 

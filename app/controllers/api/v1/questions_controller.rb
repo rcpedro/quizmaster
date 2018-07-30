@@ -1,6 +1,7 @@
 class Api::V1::QuestionsController < ApplicationController
   before_action :set_query, only: [:index]
-  before_action :set_question, only: [:show, :update, :destroy]
+  before_action :set_question, only: [:show, :update, :destroy, :validate]
+  before_action :set_checker, only: [:validate]
   before_action :set_form, only: [:create, :update]
 
   STANDARD_INCLUDES = [
@@ -48,6 +49,10 @@ class Api::V1::QuestionsController < ApplicationController
     render json: {}, status: :ok
   end
 
+  def validate
+    render json: { result: @checker.validate }
+  end
+
   protected
     def set_query
       @query = QuestionQuery.new
@@ -59,5 +64,9 @@ class Api::V1::QuestionsController < ApplicationController
 
     def set_form
       @form = QuestionForm.new(params)
+    end
+
+    def set_checker
+      @checker = Checker.new(@question, params[:answer])
     end
 end

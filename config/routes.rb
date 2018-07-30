@@ -6,7 +6,11 @@ Rails.application.routes.draw do
       resources :courses,   only: [:index, :show]
       resources :topics,    only: [:index, :show]
       resources :subtopics, only: [:index, :show]
-      resources :questions
+      resources :questions do
+        member do 
+          get :validate
+        end
+      end
       resources :quizzes,   only: [:show, :create]
     end
   end
