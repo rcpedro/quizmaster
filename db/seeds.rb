@@ -7,17 +7,17 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 english = Course.find_or_create_by!(
-  code: 'englit', name: 'English Literature', 
+  code: 'ENGLIT', name: 'English Literature', 
   description: 'Explore a wide range of texts dating from a variety of periods.'
 )
 
-french = Course.find_or_create_by!(
-  code: 'artintro', name: 'Art Introduction', 
+art = Course.find_or_create_by!(
+  code: 'ARTINTRO', name: 'Art Introduction', 
   description: 'Get an easy introduction to the visual arts or just consolidate your basic knowledge.'
 )
 
 math = Course.find_or_create_by!(
-  code: 'math', name: 'Mathematics',
+  code: 'MATH', name: 'Mathematics',
   description: 'Get introductions to algebra, geometry, trigonometry, precalculus and calculus.'
 )
 

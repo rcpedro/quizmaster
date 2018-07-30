@@ -1,4 +1,6 @@
 class Question < ApplicationRecord
+  include SoftDeletable
+  
   belongs_to :subtopic
   belongs_to :topic
   belongs_to :course
@@ -9,7 +11,7 @@ class Question < ApplicationRecord
 
   has_many :question_contents
 
-  enum status: [:draft, :published]
+  enum status: [:draft, :published, :deleted]
 
   validates :status, :subtopic, presence: true
   before_validation :denormalize_topic_and_course
